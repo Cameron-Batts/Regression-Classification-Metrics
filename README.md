@@ -1,13 +1,19 @@
 # Regression Interpretation and Classification Metrics
 **Cameron Batts**
 
+## Validation update - October 22, 2026
+
+The executable advertising workflow reproduced fitting-data R²=0.946356 and predicted sales of $71,833.33 for the illustrative $50,000 budget. All eight executable cells ran. Archived vehicle/bank fitted models remain absent, so their historical summaries were not independently reproduced. No causal advertising return or held-out forecast was measured.
+
+[Aggregate validation record](Reports/validation_results.json). [Repeatable validation script](validation/rerun_analysis.py). Run `python validation/rerun_analysis.py` from the project root. Install `requirements-validation.txt` first; source CSVs stay local.
+
 ## Problem
 Explain regression coefficients, calculate classification tradeoffs and fit a simple advertising-sales model.
 
 ## Approach
 Interpret archived vehicle-price OLS and bank-deposit logistic model summaries, compute metrics for a supplied confusion matrix, and fit sales against Facebook budget on 200 included observations.
 
-## Results
+## Historical findings and original context
 Advertising regression achieved R²=0.9464 on its fitting data and predicted approximately $71,830 in sales for a $50,000 budget. For the illustrative confusion matrix (TN=100, FP=20, FN=120, TP=80), accuracy is 56.25%, precision 80%, recall 40% and specificity 83.33%. These are separate examples, not one evaluated classifier.
 
 ## Limitations
@@ -24,7 +30,7 @@ Included-data code cells executed successfully during this update.
 python -m pip install -r requirements.txt
 jupyter lab
 ```
-Open [the notebook](Notebooks/regression_classification_metrics.ipynb) and run cells in order. Dependencies are unpinned.
+Open [the notebook](Notebooks/regression_classification_metrics.ipynb) and run cells in order. Tested numerical/NLP packages are recorded in requirements-validation.txt.
 
 ## Files
 - [Analysis report](Reports/regression_classification_metrics.html)
