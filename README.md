@@ -1,178 +1,32 @@
-# Regression & Classification Metrics Analysis
+# Regression Interpretation and Classification Metrics
+**Cameron Batts**
 
+## Problem
+Explain regression coefficients, calculate classification tradeoffs and fit a simple advertising-sales model.
 
-## Project Overview
-This project explores regression and classification modeling techniques using Python and machine learning workflows. The analysis focuses on evaluating predictive performance, understanding relationships between variables, and comparing regression and classification model behavior.
+## Approach
+Interpret archived vehicle-price OLS and bank-deposit logistic model summaries, compute metrics for a supplied confusion matrix, and fit sales against Facebook budget on 200 included observations.
 
-The repository includes:
-- linear regression modeling
-- logistic regression modeling
-- classification analysis
-- predictive metrics evaluation
-- visualization of variable relationships
-- model serialization using Joblib
+## Results
+Advertising regression achieved R²=0.9464 on its fitting data and predicted approximately $71,830 in sales for a $50,000 budget. For the illustrative confusion matrix (TN=100, FP=20, FN=120, TP=80), accuracy is 56.25%, precision 80%, recall 40% and specificity 83.33%. These are separate examples, not one evaluated classifier.
 
----
+## Limitations
+The linear_regression.joblib and logistic_regression.joblib files and their training workflows were absent. Their archived summaries remain available for interpretation, but those models cannot be reproduced from this repository. Advertising R² is in-sample with no held-out evaluation; association does not establish incremental advertising impact. Logistic effects concern odds, not probability, and balance units depend on undocumented preprocessing.
 
-# Project Objectives
-- Build predictive regression models
-- Explore classification workflows
-- Evaluate regression and classification metrics
-- Visualize relationships between marketing variables
-- Save trained machine learning models for reuse and deployment
+## Data
+Data/marketing.csv contains 200 advertising-budget and sales observations, both expressed in thousands of USD according to the original notebook. Upstream dataset provenance is not documented. Vehicle and bank model examples are archived summaries rather than bundled fitted artifacts.
 
----
+## Verification
+Included-data code cells executed successfully during this update.
 
-# Tools & Technologies
-- Python
-- pandas
-- numpy
-- matplotlib
-- scikit-learn
-- joblib
-- Jupyter Notebook
-- Machine Learning
-
----
-
-# Repository Structure
-
-```text
-Regression-Classification-Metrics/
-│
-├── Data/
-│
-├── Images/
-│   └── Scatter.png
-│
-├── Notebooks/
-│   └── regression_classification_metrics.ipynb
-│
-├── Reports/
-│
-├── linear_regression.joblib
-├── logistic_regression.joblib
-├── marketing.csv
-│
-└── README.md
+## Run
+```bash
+python -m pip install -r requirements.txt
+jupyter lab
 ```
+Open [the notebook](Notebooks/regression_classification_metrics.ipynb) and run cells in order. Dependencies are unpinned.
 
----
-
-# Exploratory Analysis
-
-The project examined relationships between marketing variables and sales outcomes using regression analysis and predictive modeling techniques.
-
-The scatterplot visualization below demonstrates the relationship between:
-- Facebook advertising spend
-- sales performance
-
----
-
-# Marketing Relationship Visualization
-
-The scatterplot shows a strong positive linear relationship between Facebook advertising spend and sales outcomes.
-
-![Marketing Scatter Plot](./Images/Scatter.png)
-
----
-
-# Regression Modeling
-
-The project implemented linear regression models to:
-- evaluate relationships between variables
-- predict sales outcomes
-- estimate continuous numerical targets
-- analyze model fit and predictive behavior
-
-Regression workflows included:
-- feature evaluation
-- model training
-- prediction generation
-- metric analysis
-
----
-
-# Classification Modeling
-
-The project also explored logistic regression classification techniques to:
-- classify outcomes
-- evaluate probability-based predictions
-- compare regression versus classification approaches
-- assess predictive performance metrics
-
-Classification analysis included:
-- model training
-- prediction analysis
-- classification evaluation
-
----
-
-# Model Serialization
-
-Trained machine learning models were saved using Joblib for future reuse and deployment.
-
-Serialized models include:
-- `linear_regression.joblib`
-- `logistic_regression.joblib`
-
-This workflow supports:
-- reproducibility
-- deployment readiness
-- efficient model reuse
-
----
-
-# Key Findings
-- Facebook advertising spend demonstrated a strong positive relationship with sales.
-- Regression models captured clear linear predictive patterns.
-- Classification workflows highlighted differences between continuous and categorical prediction approaches.
-- Model serialization improves portability and deployment efficiency.
-- Visualization supported interpretation of predictive relationships and model behavior.
-
----
-
-# Skills Demonstrated
-- Linear regression
-- Logistic regression
-- Predictive modeling
-- Classification analysis
-- Machine learning workflows
-- Model serialization
-- Exploratory data analysis
-- Python programming
-- Data visualization
-
----
-
-# Supporting Files
-
-This repository includes:
-- Jupyter notebooks
-- machine learning models
-- regression outputs
-- exploratory visualizations
-- serialized Joblib models
-
----
-
-# Data
-
-This project uses marketing and predictive modeling datasets to evaluate regression and classification workflows.
-
-The datasets were used to:
-- analyze relationships between variables
-- predict sales outcomes
-- evaluate machine learning model performance
-- demonstrate regression and classification techniques
-
----
-
-# Author
-
-Cameron Batts
-
-GitHub: https://github.com/Cameron-Batts
-
-Portfolio: https://cameron-batts.github.io
-
+## Files
+- [Analysis report](Reports/regression_classification_metrics.html)
+- [Original PDF](Reports/regression_classification_metrics.pdf): historical export; may predate corrections.
+- [Live portfolio report](https://cameron-batts.github.io/regression_classification_metrics.html)
