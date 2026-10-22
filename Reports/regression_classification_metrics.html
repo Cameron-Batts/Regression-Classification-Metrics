@@ -1,0 +1,157 @@
+<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Regression Interpretation and Classification Metrics | Cameron Batts</title><style>body{margin:0;background:#f7f8fa;color:#152540;font:16px/1.65 system-ui}main{max-width:950px;margin:auto;padding:32px 24px}h1{font:bold 2.4rem Georgia}h2{border-bottom:2px solid #e8c97a;margin-top:36px}pre{padding:18px;background:white;border-left:3px solid #c9a84c;white-space:pre-wrap;overflow-wrap:anywhere;font-size:13px}details{margin:16px 0}summary{cursor:pointer}p{overflow-wrap:anywhere}a{color:#1a3560}img{max-width:100%;height:auto}</style><main><a href="https://cameron-batts.github.io/">← Portfolio</a><h1>Regression Interpretation and Classification Metrics</h1><p><strong>Cameron Batts</strong></p><h2>Problem</h2><p>Explain regression coefficients, calculate classification tradeoffs and fit a simple advertising-sales model.</p><h2>Approach</h2><p>Interpret archived vehicle-price OLS and bank-deposit logistic model summaries, compute metrics for a supplied confusion matrix, and fit sales against Facebook budget on 200 included observations.</p><h2>Results</h2><p>Advertising regression achieved R²=0.9464 on its fitting data and predicted approximately $71,830 in sales for a $50,000 budget. For the illustrative confusion matrix (TN=100, FP=20, FN=120, TP=80), accuracy is 56.25%, precision 80%, recall 40% and specificity 83.33%. These are separate examples, not one evaluated classifier.</p><h2>Limitations</h2><p>The linear_regression.joblib and logistic_regression.joblib files and their training workflows were absent. Their archived summaries remain available for interpretation, but those models cannot be reproduced from this repository. Advertising R² is in-sample with no held-out evaluation; association does not establish incremental advertising impact. Logistic effects concern odds, not probability, and balance units depend on undocumented preprocessing.</p><h2>Data</h2><p>Data/marketing.csv contains 200 advertising-budget and sales observations, both expressed in thousands of USD according to the original notebook. Upstream dataset provenance is not documented. Vehicle and bank model examples are archived summaries rather than bundled fitted artifacts.</p><h2>Verification</h2><p>Included-data code cells executed successfully during this update.</p><details><summary>Python code</summary><pre>
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from sklearn.linear_model import LinearRegression</pre></details><pre>## Archived model summary
+The fitted model file and training workflow were not included. The following is the saved historical summary, provided for interpretation only.
+
+```text
+&lt;class &#x27;statsmodels.iolib.summary.Summary&#x27;&gt;
+&quot;&quot;&quot;
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:      log_selling_price   R-squared:                       0.779
+Model:                            OLS   Adj. R-squared:                  0.777
+Method:                 Least Squares   F-statistic:                     583.4
+Date:                Mon, 11 May 2026   Prob (F-statistic):               0.00
+Time:                        12:02:22   Log-Likelihood:                -2125.1
+No. Observations:                4340   AIC:                             4304.
+Df Residuals:                    4313   BIC:                             4476.
+Df Model:                          26                                         
+Covariance Type:            nonrobust                                         
+================================================================================================
+                                   coef    std err          t      P&gt;|t|      [0.025      0.975]
+------------------------------------------------------------------------------------------------
+const                           12.4959      0.059    212.070      0.000      12.380      12.611
+year                             0.1178      0.002     66.227      0.000       0.114       0.121
+km_driven                       -0.0008      0.000     -5.354      0.000      -0.001      -0.001
+fuel_Diesel                      0.3954      0.015     27.002      0.000       0.367       0.424
+fuel_Other                      -0.1087      0.051     -2.148      0.032      -0.208      -0.009
+seller_type_Individual          -0.1047      0.016     -6.728      0.000      -0.135      -0.074
+seller_type_Trustmark Dealer     0.3715      0.042      8.849      0.000       0.289       0.454
+owner_Other                     -0.0820      0.042     -1.963      0.050      -0.164      -0.000
+owner_Second Owner              -0.0328      0.015     -2.119      0.034      -0.063      -0.002
+owner_Third Owner               -0.0979      0.026     -3.798      0.000      -0.148      -0.047
+brand_BMW                        0.1236      0.082      1.513      0.130      -0.037       0.284
+brand_Chevrolet                 -1.7207      0.060    -28.876      0.000      -1.838      -1.604
+brand_Datsun                    -1.7509      0.084    -20.753      0.000      -1.916      -1.585
+brand_Fiat                      -1.6262      0.083    -19.481      0.000      -1.790      -1.463
+brand_Ford                      -1.3177      0.058    -22.858      0.000      -1.431      -1.205
+brand_Honda                     -1.1191      0.058    -19.433      0.000      -1.232      -1.006
+brand_Hyundai                   -1.3317      0.054    -24.594      0.000      -1.438      -1.226
+brand_Mahindra                  -1.1678      0.056    -20.824      0.000      -1.278      -1.058
+brand_Maruti                    -1.4619      0.054    -27.191      0.000      -1.567      -1.357
+brand_Mercedes-Benz              0.2986      0.084      3.540      0.000       0.133       0.464
+brand_Nissan                    -1.3616      0.072    -18.971      0.000      -1.502      -1.221
+brand_Other                     -0.2968      0.084     -3.536      0.000      -0.461      -0.132
+brand_Renault                   -1.5154      0.062    -24.615      0.000      -1.636      -1.395
+brand_Skoda                     -1.0981      0.070    -15.577      0.000      -1.236      -0.960
+brand_Tata                      -1.8146      0.056    -32.224      0.000      -1.925      -1.704
+brand_Toyota                    -0.7292      0.059    -12.350      0.000      -0.845      -0.613
+brand_Volkswagen                -1.2389      0.064    -19.276      0.000      -1.365      -1.113
+==============================================================================
+Omnibus:                      133.156   Durbin-Watson:                   1.874
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):              326.637
+Skew:                           0.109   Prob(JB):                     1.18e-71
+Kurtosis:                       4.326   Cond. No.                     3.04e+03
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+[2] The condition number is large, 3.04e+03. This might indicate that there are
+strong multicollinearity or other numerical problems.
+&quot;&quot;&quot;
+```</pre><p>Model reload is unavailable; no deployment-ready artifact is bundled.</p><p>Holding all other variables constant, a car branded as a Maruti is associated with an approximate 76.82% decrease in selling price compared to the baseline brand. Using (e^-1.4619)-1</p><p>Holding all other variables such as mileage and fuel type constant, each one-year increase in the car&#x27;s model year is associated with an approximate 12.5% increase in the selling price using (e^.1178)-1=12%</p><p>---</p><p>The archived bank-marketing logistic regression example models term-deposit subscription.</p><pre>## Archived model summary
+The fitted model file and training workflow were not included. The following is the saved historical summary, provided for interpretation only.
+
+```text
+&lt;class &#x27;statsmodels.iolib.summary.Summary&#x27;&gt;
+&quot;&quot;&quot;
+                           Logit Regression Results                           
+==============================================================================
+Dep. Variable:                      y   No. Observations:                45211
+Model:                          Logit   Df Residuals:                    45185
+Method:                           MLE   Df Model:                           25
+Date:                Mon, 11 May 2026   Pseudo R-squ.:                 0.09451
+Time:                        12:02:22   Log-Likelihood:                -14774.
+converged:                       True   LL-Null:                       -16315.
+Covariance Type:            nonrobust   LLR p-value:                     0.000
+=======================================================================================
+                          coef    std err          z      P&gt;|z|      [0.025      0.975]
+---------------------------------------------------------------------------------------
+const                  -1.2729      0.103    -12.347      0.000      -1.475      -1.071
+age                     0.0045      0.002      2.407      0.016       0.001       0.008
+balance                 0.0211      0.004      5.145      0.000       0.013       0.029
+campaign               -0.1321      0.009    -15.418      0.000      -0.149      -0.115
+previous                0.0902      0.006     14.719      0.000       0.078       0.102
+job_blue-collar        -0.2321      0.062     -3.745      0.000      -0.354      -0.111
+job_entrepreneur       -0.4052      0.108     -3.759      0.000      -0.616      -0.194
+job_housemaid          -0.3983      0.114     -3.490      0.000      -0.622      -0.175
+job_management         -0.1714      0.062     -2.773      0.006      -0.293      -0.050
+job_retired             0.4701      0.080      5.876      0.000       0.313       0.627
+job_self-employed      -0.2233      0.094     -2.381      0.017      -0.407      -0.039
+job_services           -0.1902      0.071     -2.673      0.008      -0.330      -0.051
+job_student             0.4715      0.092      5.126      0.000       0.291       0.652
+job_technician         -0.2076      0.058     -3.563      0.000      -0.322      -0.093
+job_unemployed          0.0513      0.091      0.562      0.574      -0.128       0.230
+job_unknown            -0.2314      0.196     -1.182      0.237      -0.615       0.152
+marital_divorced       -0.1844      0.056     -3.282      0.001      -0.294      -0.074
+marital_married        -0.3437      0.039     -8.907      0.000      -0.419      -0.268
+education_secondary     0.1726      0.054      3.173      0.002       0.066       0.279
+education_tertiary      0.4020      0.063      6.388      0.000       0.279       0.525
+education_unknown       0.2823      0.087      3.234      0.001       0.111       0.453
+default_yes            -0.3472      0.148     -2.352      0.019      -0.637      -0.058
+housing_yes            -0.6474      0.033    -19.509      0.000      -0.712      -0.582
+loan_yes               -0.5841      0.051    -11.408      0.000      -0.684      -0.484
+contact_telephone      -0.2077      0.061     -3.415      0.001      -0.327      -0.089
+contact_unknown        -1.1324      0.049    -23.143      0.000      -1.228      -1.036
+=======================================================================================
+&quot;&quot;&quot;
+```</pre><p>Here is the model summary:</p><p>Model reload is unavailable; no deployment-ready artifact is bundled.</p><p>And these are the model&#x27;s coefficients after exponentiation.</p><p>From the saved logistic coefficients: exp(−0.2233)≈0.7999 for self-employed and exp(0.0211)≈1.0213 for balance. These multiply odds, holding other covariates fixed.</p><p>Holding all other variables constant, being self-employed is associated with a 20% decrease (less than 1), in the odds of subscribing to a term deposit compared to the baseline job category. 0.7998−1=−0.2002</p><p>A one-unit increase in the balance predictor is associated with approximately 2.13% higher odds of subscription. Its raw currency interpretation requires the original preprocessing, which is not bundled.</p><p>---</p><p>Consider the following confusion matrix:</p><pre>|                 | **Predictions** |       | **0** | **1** |
+|---              |---              |---    |---  |---  |
+| **True labels** |                 | **0** | 100 | 20 |
+|                 |                 | **1** | 120 | 80 |</pre><p>Illustrative confusion matrix: TN=100, FP=20, FN=120, TP=80; total=320.</p><p>Accuracy = (TP+TN)/total = 56.25%.</p><p>Precision = TP/(TP+FP) = 80%.</p><p>Recall = TP/(TP+FN) = 40%.</p><p>Specificity = TN/(TN+FP) = 83.33%.</p><p>---</p><p>Now, let&#x27;s consider the following marketing data.</p><details><summary>Python code</summary><pre>from pathlib import Path
+project_root = Path.cwd().parent if Path.cwd().name in (&#x27;Notebook&#x27;, &#x27;Notebooks&#x27;) else Path.cwd()
+marketing_data = pd.read_csv(project_root / &#x27;Data&#x27; / &#x27;marketing.csv&#x27;)</pre></details><details><summary>Python code</summary><pre>marketing_data.head()</pre></details><pre>   facebook  sales
+0     45.36  72.52
+1     47.16  60.48
+2     55.08  67.16
+3     49.56  72.20
+4     12.96  28.48
+</pre><p>Both facebook and sales are recorded in thousands of USD. Sales are associated with the campaign budget; causation is not established by this fit.</p><details><summary>Python code</summary><pre>_ = sns.scatterplot(x=&#x27;facebook&#x27;, y=&#x27;sales&#x27;, data=marketing_data)</pre></details><details><summary>Python code</summary><pre>X = marketing_data[&#x27;facebook&#x27;].values.reshape(-1, 1)
+Y = marketing_data[&#x27;sales&#x27;]
+
+Simple_Linear_Regression= LinearRegression()
+Simple_Linear_Regression = LinearRegression().fit(X, Y)
+Simple_Linear_Regression.score(X, Y)
+
+</pre></details><pre>0.9463557108459727
+</pre><p>The in-sample R² is approximately 0.9464. This describes fit to the observed data and is not held-out predictive performance.</p><details><summary>Python code</summary><pre>prediction = Simple_Linear_Regression.predict([[50]])
+print(f&#x27;Predicted sales for a $50,000 budget: ${prediction[0] * 1000:,.2f}&#x27;)</pre></details><pre>Predicted sales for a $50,000 budget: $71,833.33
+</pre><p>Formula used by the summary: 71.83=Intercept_coef+(facebook_coef×50)</p><details><summary>Python code</summary><pre>import statsmodels.formula.api as smf
+simple_linear_regression_sm = smf.ols(&#x27;sales ~ facebook&#x27;, data=marketing_data).fit()</pre></details><details><summary>Python code</summary><pre>print(simple_linear_regression_sm.summary())</pre></details><pre>                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:                  sales   R-squared:                       0.946
+Model:                            OLS   Adj. R-squared:                  0.946
+Method:                 Least Squares   F-statistic:                     3493.
+Date:                Thu, 22 Oct 2026   Prob (F-statistic):          9.72e-128
+Time:                        10:46:57   Log-Likelihood:                -609.40
+No. Observations:                 200   AIC:                             1223.
+Df Residuals:                     198   BIC:                             1229.
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+==============================================================================
+                 coef    std err          t      P&gt;|t|      [0.025      0.975]
+------------------------------------------------------------------------------
+Intercept     11.6375      0.674     17.263      0.000      10.308      12.967
+facebook       1.2039      0.020     59.101      0.000       1.164       1.244
+==============================================================================
+Omnibus:                       20.420   Durbin-Watson:                   1.948
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):               23.417
+Skew:                          -0.785   Prob(JB):                     8.22e-06
+Kurtosis:                       3.585   Cond. No.                         61.7
+==============================================================================
+
+Notes:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+</pre><figure><img alt="Historical analysis visualization: Scatter" src="https://raw.githubusercontent.com/Cameron-Batts/Regression-Classification-Metrics/main/Images/Scatter.png"><figcaption>Historical visualization: Scatter</figcaption></figure></main></html>
